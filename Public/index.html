@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>WebGL Fixed Size Camera + Text Overlay</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: sans-serif;
+        background: #111;
+        color: white;
+        display: flex;
+        flex-direction: row;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      #glcanvas {
+        width: 50vw;
+        height: 100vh;
+        display: block;
+      }
+
+      #controls {
+        width: 50vw;
+        padding: 20px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .score-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .score-controls h3 {
+        margin: 0;
+      }
+
+      .team-section {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background: #222;
+        padding: 10px;
+        border-radius: 8px;
+      }
+
+      button {
+        margin: 2px;
+        padding: 5px 10px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      input[type="text"] {
+        font-size: 16px;
+        padding: 5px;
+      }
+
+      video {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="glcanvas"></canvas>
+
+    <div id="controls">
+      <h2>Controls</h2>
+
+      <div class="team-section">
+        <label>Left Team Name:</label>
+        <input type="text" id="leftTeamName" value="TEAM A" />
+        <div class="score-controls">
+          <h3>Left Score</h3>
+          <div>
+            <button onclick="addScore('left', 1)">+1</button>
+            <button onclick="addScore('left', 2)">+2</button>
+            <button onclick="addScore('left', 3)">+3</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="team-section">
+        <label>Right Team Name:</label>
+        <input type="text" id="rightTeamName" value="TEAM B" />
+        <div class="score-controls">
+          <h3>Right Score</h3>
+          <div>
+            <button onclick="addScore('right', 1)">+1</button>
+            <button onclick="addScore('right', 2)">+2</button>
+            <button onclick="addScore('right', 3)">+3</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <video id="debugVideo" playsinline muted></video>
+    <script src="main.js"></script>
+  </body>
+</html>
