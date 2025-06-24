@@ -265,7 +265,7 @@ try {
 } catch (e) {
   alert("H.264 MediaRecorder not supported.");
 }
-const socket = new WebSocket("ws://localhost:8088");
+const socket = new WebSocket("https://rsl-livestream-lwkk.onrender.com");
 recorder.ondataavailable = (e) => {
   if (e.data.size > 0 && socket.readyState === WebSocket.OPEN) {
     socket.send(e.data);
