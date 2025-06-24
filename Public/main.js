@@ -265,7 +265,11 @@ try {
 } catch (e) {
   alert("H.264 MediaRecorder not supported.");
 }
-const socket = new WebSocket("ws://localhost:8088");
+const protocol = location.protocol === "https:" ? "wss" : "ws";
+const socket = new WebSocket(`${protocol}://${location.host}`);
+
+socket.onopen = () => console.log("✅ Connected to WebSocket");
+socket.onerror = (e) => console.error("❌ WebSocket error", e);
 recorder.ondataavailable = (e) => {
   if (e.data.size > 0 && socket.readyState === WebSocket.OPEN) {
     socket.send(e.data);
