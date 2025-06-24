@@ -3,6 +3,7 @@ const https = require("https");
 const express = require("express");
 const WebSocket = require("ws");
 const { spawn } = require("child_process");
+const ffmpegPath = "ffmpeg";
 
 const app = express();
 app.use(express.static("public"));
@@ -19,10 +20,9 @@ httpsServer.listen(3000, () => {
 });
 
 // 🧩 Add WebSocket server for FFmpeg piping (on port 8080 or reuse HTTPS server)
-const wss = new WebSocket.Server({ port: 8088 }); // or use: { server: httpsServer }
-
-const ffmpegPath =
-  "C:/Users/Owner/Desktop/JonProject/ffmpeg/ffmpeg/bin/ffmpeg.exe";
+const port = process.env.PORT || 8080;
+const wss = new WebSocket.Server("https://rsl-livestream-lwkk.onrender.com");
+console.log(`📡 WebSocket server running on port ${port}`);
 
 wss.on("connection", function connection(ws) {
   console.log("📡 WebSocket client connected");
