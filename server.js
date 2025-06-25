@@ -1,40 +1,27 @@
-const fs = require("fs");
-const https = require("https");
 const express = require("express");
-const WebSocket = require("ws");
+const { WebSocketServer } = require("ws");
 const { spawn } = require("child_process");
+const http = require("http");
 
 const app = express();
-app.use(express.static("public"));
+app.use(express.static("public")); // serve frontend
 
-const sslOptions = {
-  key: fs.readFileSync("cert/key.pem"),
-  cert: fs.readFileSync("cert/cert.pem"),
-};
+const server = http.createServer(app); // ✅ No HTTPS — Render handles SSL
 
-const httpsServer = https.createServer(sslOptions, app);
+// ✅ Attach WebSocket to the same server — don't use `port`
+const wss = new WebSocketServer({ server });
 
-httpsServer.listen(3000, () => {
-  console.log("🔒 HTTPS server running at https://localhost:3000");
-});
-
-// 🧩 Add WebSocket server for FFmpeg piping (on port 8080 or reuse HTTPS server)
-const wss = new WebSocket.Server({ port: 8088 }); // or use: { server: httpsServer }
-
-const ffmpegPath =
-  "C:/Users/Owner/Desktop/JonProject/ffmpeg/ffmpeg/bin/ffmpeg.exe";
-
-wss.on("connection", function connection(ws) {
+wss.on("connection", (ws) => {
   console.log("📡 WebSocket client connected");
 
-  const ffmpeg = spawn(ffmpegPath, [
-    "-re", // real-time input pacing
+  const ffmpeg = spawn("ffmpeg", [
+    "-re",
     "-f",
-    "webm", // or use rawvideo/yuv4mpegpipe if you're piping raw frames
+    "webm",
     "-i",
-    "pipe:0", // read from stdin
+    "pipe:0",
 
-    // Dummy audio input
+    // Dummy audio
     "-f",
     "lavfi",
     "-i",
@@ -54,11 +41,11 @@ wss.on("connection", function connection(ws) {
     "-bufsize",
     "5000k",
     "-g",
-    "60", // keyframe every 2s for 30fps
+    "60",
     "-r",
     "30",
 
-    // Audio encoding
+    // Audio
     "-c:a",
     "aac",
     "-b:a",
@@ -69,7 +56,7 @@ wss.on("connection", function connection(ws) {
     // Output
     "-f",
     "flv",
-    "rtmps://live-api-s.facebook.com:443/rtmp/FB-665053932562556-0-Ab1eyRCvkkMP4LJ3Wd6xIHiq", // use rtmp:// for Facebook Live
+    "rtmps://live-api-s.facebook.com:443/rtmp/FB-xxxxx", // ← Replace with real stream key
   ]);
 
   ffmpeg.stderr.on("data", (data) => {
@@ -89,4 +76,9 @@ wss.on("connection", function connection(ws) {
     ffmpeg.stdin.end();
     ffmpeg.kill("SIGINT");
   });
+});
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
