@@ -1,11 +1,7 @@
 const express = require("express");
 const { WebSocketServer } = require("ws");
 const { spawn } = require("child_process");
-<<<<<<< HEAD
 const http = require("http");
-=======
-const ffmpegPath = "ffmpeg";
->>>>>>> 54af22cf4bcbb1d7c7dcfaef19771fef800a34aa
 
 const app = express();
 app.use(express.static("public")); // serve frontend
@@ -15,20 +11,7 @@ const server = http.createServer(app); // ✅ No HTTPS — Render handles SSL
 // ✅ Attach WebSocket to the same server — don't use `port`
 const wss = new WebSocketServer({ server });
 
-<<<<<<< HEAD
 wss.on("connection", (ws) => {
-=======
-httpsServer.listen(3000, () => {
-  console.log("🔒 HTTPS server running at https://localhost:3000");
-});
-
-// 🧩 Add WebSocket server for FFmpeg piping (on port 8080 or reuse HTTPS server)
-const port = process.env.PORT || 8080;
-const wss = new WebSocket.Server("https://rsl-livestream-lwkk.onrender.com");
-console.log(`📡 WebSocket server running on port ${port}`);
-
-wss.on("connection", function connection(ws) {
->>>>>>> 54af22cf4bcbb1d7c7dcfaef19771fef800a34aa
   console.log("📡 WebSocket client connected");
 
   const ffmpeg = spawn("ffmpeg", [
