@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: rsl-livestream
+    env: node
+    plan: free
+    buildCommand: |
+      apt-get update && apt-get install -y ffmpeg
+    startCommand: node server.js
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
