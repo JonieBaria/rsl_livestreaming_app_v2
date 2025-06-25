@@ -15,34 +15,37 @@ wss.on("connection", (ws) => {
   console.log("📡 WebSocket client connected");
 
   const ffmpeg = spawn("ffmpeg", [
-    // Input from pipe (webm with audio+video)
     "-re",
     "-f",
     "webm",
     "-i",
     "pipe:0",
 
+    // Dummy audio
+    "-f",
+    "lavfi",
+    "-i",
+    "anullsrc=channel_layout=stereo:sample_rate=44100",
+
     // Video encoding
     "-c:v",
     "libx264",
     "-preset",
-    "ultrafast", // lower latency
+    "veryfast",
     "-tune",
-    "zerolatency", // no buffering
+    "zerolatency",
     "-pix_fmt",
     "yuv420p",
-    "-r",
-    "30", // target fps
-    "-g",
-    "30", // GOP size = 1s @30fps
     "-b:v",
     "2500k",
-    "-maxrate",
-    "2500k",
     "-bufsize",
-    "500k", // smaller buffer = lower latency
+    "5000k",
+    "-g",
+    "60",
+    "-r",
+    "30",
 
-    // Audio encoding (from browser)
+    // Audio
     "-c:a",
     "aac",
     "-b:a",
@@ -50,10 +53,10 @@ wss.on("connection", (ws) => {
     "-ar",
     "44100",
 
-    // Output to Facebook RTMP
+    // Output
     "-f",
     "flv",
-    "rtmps://live-api-s.facebook.com:443/rtmp/FB-665053932562556-0-Ab1eyRCvkkMP4LJ3Wd6xIHiq", // ← Replace with real stream key
+    "rtmp://live-api-s.facebook.com:443/rtmp/FB-665053932562556-0-Ab1eyRCvkkMP4LJ3Wd6xIHiq", // ← Replace with real stream key
   ]);
 
   ffmpeg.stderr.on("data", (data) => {
