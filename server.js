@@ -52,7 +52,7 @@ wss.on("connection", (ws) => {
     // Output to Facebook RTMP
     "-f",
     "flv",
-    "rtmp://live-api-s.facebook.com:443/rtmp/FB-665053932562556-0-Ab1eyRCvkkMP4LJ3Wd6xIHiq", // ← Replace with real stream key
+    "rtmps://live-api-s.facebook.com:443/rtmp/FB-665053932562556-0-Ab1eyRCvkkMP4LJ3Wd6xIHiq", // ← Replace with real stream key
   ]);
 
   ffmpeg.stderr.on("data", (data) => {
