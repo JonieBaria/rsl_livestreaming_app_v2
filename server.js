@@ -15,8 +15,6 @@ wss.on("connection", (ws) => {
   console.log("📡 WebSocket client connected");
 
   const ffmpeg = spawn("ffmpeg", [
-    "-rtmp_transport",
-    "tcp",
     "-re",
     "-f",
     "webm",
