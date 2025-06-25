@@ -31,7 +31,7 @@ wss.on("connection", (ws) => {
     "-c:v",
     "libx264",
     "-preset",
-    "veryfast",
+    "ultrafast",
     "-tune",
     "zerolatency",
     "-pix_fmt",
@@ -41,7 +41,7 @@ wss.on("connection", (ws) => {
     "-bufsize",
     "500k",
     "-g",
-    "60",
+    "30",
     "-r",
     "30",
 
