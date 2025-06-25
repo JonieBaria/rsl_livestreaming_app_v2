@@ -280,4 +280,4 @@ recorder.ondataavailable = (e) => {
     socket.send(e.data);
   }
 };
-recorder.start(250);
+recorder.start(100);
