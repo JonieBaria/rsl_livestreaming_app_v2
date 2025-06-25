@@ -16,6 +16,7 @@ wss.on("connection", (ws) => {
 
   const ffmpeg = spawn("ffmpeg", [
     // Input from pipe (webm with audio+video)
+    "-re",
     "-f",
     "webm",
     "-i",
