@@ -183,9 +183,18 @@ function renderLogo() {
 }
 
 // === Camera Setup ===
+const constraints = {
+  video: {
+    facingMode: { exact: "environment" }, // rear camera
+    width: { ideal: 1280 },
+    height: { ideal: 720 },
+  },
+  audio: true, // or true if you need mic
+};
+
 const video = document.getElementById("debugVideo");
 navigator.mediaDevices
-  .getUserMedia({ video: true })
+  .getUserMedia(constraints)
   .then((stream) => {
     video.srcObject = stream;
     video.play();
@@ -260,7 +269,7 @@ let stream = canvas.captureStream(30);
 let recorder;
 try {
   recorder = new MediaRecorder(stream, {
-    mimeType: "video/webm;codecs=h264",
+    mimeType: "video/webm;codecs=vp8",
   });
 } catch (e) {
   alert("H.264 MediaRecorder not supported.");
@@ -271,4 +280,4 @@ recorder.ondataavailable = (e) => {
     socket.send(e.data);
   }
 };
-recorder.start(100);
+recorder.start(250);
