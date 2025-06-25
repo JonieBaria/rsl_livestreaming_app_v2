@@ -4,7 +4,7 @@ const { spawn } = require("child_process");
 const http = require("http");
 
 const app = express();
-app.use(express.static("public")); // serve frontend
+app.use(express.static("Public")); // serve frontend
 
 const server = http.createServer(app); // ✅ No HTTPS — Render handles SSL
 
