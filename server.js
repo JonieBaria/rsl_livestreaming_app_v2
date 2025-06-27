@@ -39,7 +39,7 @@ wss.on("connection", (ws) => {
     "-pix_fmt",
     "yuv420p", // Pixel format needed for compatibility with players like Facebook
     "-b:v",
-    "800k", // Target video bitrate 2.5 Mbps (adjust if bandwidth is lower)
+    "600k", // Target video bitrate 2.5 Mbps (adjust if bandwidth is lower)
     "-bufsize",
     "500k", // Buffer size for rate control; smoothens bitrate spikes
     "-g",
