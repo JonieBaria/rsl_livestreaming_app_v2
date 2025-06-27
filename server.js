@@ -15,66 +15,73 @@ wss.on("connection", (ws) => {
   console.log("📡 WebSocket client connected");
 
   const ffmpeg = spawn("ffmpeg", [
-    "-re", // Pace input in real time; prevents sending too fast
+    "-re",
     "-f",
-    "webm", // Input format: WebM (from browser MediaRecorder)
+    "webm",
     "-r",
-    "30", // Interpret input as 30 FPS (MUST split: "-r", "30")
+    "30",
     "-i",
-    "pipe:0", // Read input from stdin (your NodeJS pipe)
-
-    // Dummy audio source (if your browser stream has no audio)
+    "pipe:0",
     "-f",
-    "lavfi", // Filter as input
+    "lavfi",
     "-i",
     "anullsrc=channel_layout=stereo:sample_rate=44100",
-
-    // Video encoding options
     "-c:v",
-    "libx264", // Encode video with H.264
+    "libx264",
     "-preset",
-    "ultrafast", // Fastest compression; least CPU-intensive
+    "ultrafast",
     "-tune",
-    "zerolatency", // Reduce latency for live streaming
+    "zerolatency",
     "-pix_fmt",
-    "yuv420p", // Pixel format needed for compatibility with players like Facebook
+    "yuv420p",
     "-b:v",
-    "600k", // Target video bitrate 2.5 Mbps (adjust if bandwidth is lower)
+    "600k",
     "-bufsize",
-    "500k", // Buffer size for rate control; smoothens bitrate spikes
+    "500k",
     "-g",
-    "30", // GOP size: keyframe every 1 second at 30 FPS
+    "30",
     "-r",
-    "30", // Output framerate fixed at 30 FPS
-
-    // Audio encoding options
+    "30",
     "-c:a",
-    "aac", // Encode audio with AAC (FB requires AAC)
+    "aac",
     "-b:a",
-    "128k", // Audio bitrate
+    "128k",
     "-ar",
-    "44100", // Audio sample rate
-
-    // Output
+    "44100",
     "-f",
-    "flv", // Output format: FLV (required for RTMP)
-    "rtmps://live-api-s.facebook.com:443/rtmp/FB-665053932562556-0-Ab1eyRCvkkMP4LJ3Wd6xIHiq", // Replace with your actual stream key
+    "flv",
+    "rtmps://live-api-s.facebook.com:443/rtmp/FB-665053932562556-0-Ab1eyRCvkkMP4LJ3Wd6xIHiq",
   ]);
 
-  ffmpeg.stderr.on("data", (data) => {
-    console.log("FFmpeg:", data.toString());
-  });
+  ffmpeg.stderr.on("data", (data) => console.log("FFmpeg:", data.toString()));
+  ffmpeg.on("close", (code) =>
+    console.log("FFmpeg process exited with code", code)
+  );
 
-  ffmpeg.on("close", (code) => {
-    console.log("FFmpeg process exited with code", code);
-  });
+  // 🟢 === Add buffer queue for 20s delay ===
+  const BUFFER_DELAY_MS = 20000; // 20 seconds
+  const bufferQueue = [];
+
+  // 🟢 Periodically release buffered chunks after delay
+  const bufferInterval = setInterval(() => {
+    const now = Date.now();
+    while (
+      bufferQueue.length > 0 &&
+      now - bufferQueue[0].ts >= BUFFER_DELAY_MS
+    ) {
+      const chunk = bufferQueue.shift();
+      ffmpeg.stdin.write(chunk.data);
+    }
+  }, 10);
 
   ws.on("message", (msg) => {
-    ffmpeg.stdin.write(msg);
+    // 🟢 Instead of writing directly, store chunk with timestamp
+    bufferQueue.push({ ts: Date.now(), data: msg });
   });
 
   ws.on("close", () => {
     console.log("🔌 WebSocket disconnected");
+    clearInterval(bufferInterval); // 🟢 stop buffer timer
     ffmpeg.stdin.end();
     ffmpeg.kill("SIGINT");
   });
