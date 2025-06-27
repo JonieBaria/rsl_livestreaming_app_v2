@@ -186,9 +186,9 @@ function renderLogo() {
 const constraints = {
   video: {
     facingMode: { exact: "environment" }, // rear camera
-    width: { ideal: 1280 },
-    height: { ideal: 720 },
-    frameRate: { ideal: 30, max: 30 },
+    width: { ideal: 640 }, // 640x360 or 640x480
+    height: { ideal: 360 },
+    frameRate: { ideal: 15, max: 30 },
   },
   audio: true, // or true if you need mic
 };
