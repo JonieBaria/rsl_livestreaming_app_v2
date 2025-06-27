@@ -15,8 +15,6 @@ wss.on("connection", (ws) => {
   console.log("📡 WebSocket client connected");
 
   const ffmpeg = spawn("ffmpeg", [
-    "-loglevel",
-    "info",
     "-re", // Pace input in real time; prevents sending too fast
     "-f",
     "webm", // Input format: WebM (from browser MediaRecorder)
