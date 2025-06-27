@@ -23,9 +23,11 @@ wss.on("connection", (ws) => {
     "-i",
     "pipe:0", // Read input from stdin (your NodeJS pipe)
 
-    // // Dummy audio source (if your browser stream has no audio)
-    // "-f", "lavfi",                 // Filter as input
-    // "-i", "anullsrc=channel_layout=stereo:sample_rate=44100",
+    // Dummy audio source (if your browser stream has no audio)
+    "-f",
+    "lavfi", // Filter as input
+    "-i",
+    "anullsrc=channel_layout=stereo:sample_rate=44100",
 
     // Video encoding options
     "-c:v",
