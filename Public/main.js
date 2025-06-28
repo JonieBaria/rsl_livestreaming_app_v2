@@ -94,15 +94,14 @@ function renderOverlay() {
 
   ctx.clearRect(0, 0, w, totalHeight);
 
-  // Shadow for entire bug
+  // Shadow for entire scorebug
   ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
   ctx.shadowBlur = 12;
   ctx.shadowOffsetX = 0;
   ctx.shadowOffsetY = 4;
 
-  // === Rounded background for the whole scorebug (including bar) ===
+  // === Rounded background + clip region ===
   const radius = 16;
-  ctx.fillStyle = "#222";
   ctx.beginPath();
   ctx.moveTo(radius, 0);
   ctx.lineTo(w - radius, 0);
@@ -114,20 +113,25 @@ function renderOverlay() {
   ctx.lineTo(0, radius);
   ctx.quadraticCurveTo(0, 0, radius, 0);
   ctx.closePath();
-  ctx.fill();
 
-  // === Left panel (red) — no slant, just rectangle ===
+  ctx.fillStyle = "#222";
+  ctx.fill();
+  ctx.clip(); // Everything else is confined inside rounded border
+
+  // === Left panel (red) — rectangle ===
   const leftPanelW = 300;
-  ctx.fillStyle = ctx.createLinearGradient(0, 0, 200, 0);
-  ctx.fillStyle.addColorStop(0, "#FF5252");
-  ctx.fillStyle.addColorStop(1, "#D32F2F");
+  let redGradient = ctx.createLinearGradient(0, 0, 200, 0);
+  redGradient.addColorStop(0, "#FF5252");
+  redGradient.addColorStop(1, "#D32F2F");
+  ctx.fillStyle = redGradient;
   ctx.fillRect(0, 0, leftPanelW, h);
 
-  // === Right panel (blue) — no slant, just rectangle ===
+  // === Right panel (blue) — rectangle ===
   const rightPanelW = 300;
-  ctx.fillStyle = ctx.createLinearGradient(w - 200, 0, w, 0);
-  ctx.fillStyle.addColorStop(0, "#1976D2");
-  ctx.fillStyle.addColorStop(1, "#64B5F6");
+  let blueGradient = ctx.createLinearGradient(w - 200, 0, w, 0);
+  blueGradient.addColorStop(0, "#1976D2");
+  blueGradient.addColorStop(1, "#64B5F6");
+  ctx.fillStyle = blueGradient;
   ctx.fillRect(w - rightPanelW, 0, rightPanelW, h);
 
   // === Center box ===
@@ -203,7 +207,7 @@ function draw() {
   requestAnimationFrame(draw);
 }
 
-// // === Recorder Setup (Optional) ===
+// === Recorder setup (optional) ===
 let stream = canvas.captureStream(30);
 let recorder;
 try {
