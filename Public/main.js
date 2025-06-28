@@ -5,7 +5,6 @@ if (!gl) throw new Error("WebGL not supported");
 canvas.width = 1280;
 canvas.height = 720;
 
-// Enable transparency
 gl.enable(gl.BLEND);
 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
@@ -45,7 +44,7 @@ gl.attachShader(program, fs);
 gl.linkProgram(program);
 gl.useProgram(program);
 
-// === Quad Geometry ===
+// === Quad geometry ===
 const vertexData = new Float32Array([
   -1, -1, 0, 0, 0, 1, -1, 0, 1, 0, -1, 1, 0, 0, 1, 1, 1, 0, 1, 1,
 ]);
@@ -73,10 +72,6 @@ function setupTexture(tex) {
 setupTexture(videoTexture);
 setupTexture(overlayTexture);
 
-const logoImage = new Image();
-logoImage.src = "RSL.png"; // or your real logo path
-
-// === Canvas overlay for text & scorebug ===
 const textCanvas = document.createElement("canvas");
 const ctx = textCanvas.getContext("2d");
 
@@ -88,7 +83,6 @@ function addScore(side, points) {
   else if (side === "right") rightScore += points;
 }
 
-// === Overlay Rendering ===
 function renderOverlay() {
   const leftName = document.getElementById("leftTeamName").value;
   const rightName = document.getElementById("rightTeamName").value;
@@ -96,34 +90,33 @@ function renderOverlay() {
   const h = 60;
   const leagueBarHeight = 24;
   const totalHeight = h + leagueBarHeight;
-
-  textCanvas.height = totalHeight; // Make sure to include league bar height
+  textCanvas.height = totalHeight;
 
   ctx.clearRect(0, 0, w, totalHeight);
 
-  // Shadow for main scorebug
+  // Shadow for entire bug
   ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
   ctx.shadowBlur = 12;
   ctx.shadowOffsetX = 0;
   ctx.shadowOffsetY = 4;
 
-  // Rounded rectangle background
-  const radius = 12;
+  // === Rounded background for the whole scorebug (including bar) ===
+  const radius = 16;
   ctx.fillStyle = "#222";
   ctx.beginPath();
   ctx.moveTo(radius, 0);
   ctx.lineTo(w - radius, 0);
   ctx.quadraticCurveTo(w, 0, w, radius);
-  ctx.lineTo(w, h - radius);
-  ctx.quadraticCurveTo(w, h, w - radius, h);
-  ctx.lineTo(radius, h);
-  ctx.quadraticCurveTo(0, h, 0, h - radius);
+  ctx.lineTo(w, totalHeight - radius);
+  ctx.quadraticCurveTo(w, totalHeight, w - radius, totalHeight);
+  ctx.lineTo(radius, totalHeight);
+  ctx.quadraticCurveTo(0, totalHeight, 0, totalHeight - radius);
   ctx.lineTo(0, radius);
   ctx.quadraticCurveTo(0, 0, radius, 0);
   ctx.closePath();
   ctx.fill();
 
-  // Red left panel
+  // === Left panel (red) — sharp edges ===
   let redGradient = ctx.createLinearGradient(0, 0, 200, 0);
   redGradient.addColorStop(0, "#FF5252");
   redGradient.addColorStop(1, "#D32F2F");
@@ -136,7 +129,7 @@ function renderOverlay() {
   ctx.fillStyle = redGradient;
   ctx.fill();
 
-  // Blue right panel
+  // === Right panel (blue) — sharp edges ===
   let blueGradient = ctx.createLinearGradient(w - 200, 0, w, 0);
   blueGradient.addColorStop(0, "#1976D2");
   blueGradient.addColorStop(1, "#64B5F6");
@@ -149,12 +142,12 @@ function renderOverlay() {
   ctx.fillStyle = blueGradient;
   ctx.fill();
 
-  // Center black box for score
+  // === Center box (overlapping both panels) ===
   const centerW = 150;
   ctx.fillStyle = "#111";
   ctx.fillRect((w - centerW) / 2, 0, centerW, h);
 
-  // Team Names
+  // === Team names ===
   ctx.fillStyle = "#fff";
   ctx.font = "bold 30px Arial";
   ctx.textAlign = "center";
@@ -162,16 +155,15 @@ function renderOverlay() {
   ctx.fillText(leftName, 130, h / 2);
   ctx.fillText(rightName, w - 130, h / 2);
 
-  // Score text
+  // === Score text ===
   ctx.font = "bold 36px Arial";
   ctx.fillText(`${leftScore} - ${rightScore}`, w / 2, h / 2);
 
-  // Separate league bar below
+  // === League bar ===
   ctx.shadowBlur = 6;
   ctx.fillStyle = "#000";
   ctx.fillRect(0, h, w, leagueBarHeight);
 
-  // League text in separate bar
   ctx.fillStyle = "#bbb";
   ctx.font = "900 15px Arial";
   ctx.textAlign = "center";
@@ -179,7 +171,7 @@ function renderOverlay() {
   ctx.fillText("RIZAL SPORTS LEAGUE", w / 2, h + leagueBarHeight / 2);
 }
 
-// === Camera Video Setup ===
+// === Camera setup ===
 const video = document.getElementById("debugVideo");
 navigator.mediaDevices
   .getUserMedia({ video: true })
@@ -190,7 +182,6 @@ navigator.mediaDevices
   })
   .catch((err) => alert("Camera access denied: " + err.message));
 
-// === WebGL Draw Loop ===
 function draw() {
   gl.viewport(0, 0, canvas.width, canvas.height);
   gl.clear(gl.COLOR_BUFFER_BIT);
@@ -215,7 +206,7 @@ function draw() {
   const overlayW = textCanvas.width;
   const overlayH = textCanvas.height;
   const overlayX = (canvas.width - overlayW) / 2;
-  const overlayY = canvas.height * 0.03;
+  const overlayY = canvas.height * 0.03; // slight top margin
 
   gl.viewport(overlayX, overlayY, overlayW, overlayH);
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
