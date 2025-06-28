@@ -105,41 +105,24 @@ function renderOverlay() {
   const h = (textCanvas.height = 60);
   ctx.clearRect(0, 0, w, h);
 
-  // Shadow
-  ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
-  ctx.shadowBlur = 20;
-  ctx.shadowOffsetX = 0;
-  ctx.shadowOffsetY = 6;
-
-  // Left Panel (Red)
-  let redGradient = ctx.createLinearGradient(0, 0, 180, 0);
+  // Left Panel (Red) — simple horizontal rectangle
+  let redGradient = ctx.createLinearGradient(0, 0, 160, 0);
   redGradient.addColorStop(0, "#FF5252");
   redGradient.addColorStop(1, "#D32F2F");
-  ctx.beginPath();
-  ctx.moveTo(0, 0);
-  ctx.lineTo(320, 0);
-  ctx.lineTo(290, h);
-  ctx.lineTo(0, h);
-  ctx.closePath();
   ctx.fillStyle = redGradient;
-  ctx.fill();
+  ctx.fillRect(0, 0, 160, h);
 
-  // Right Panel (Blue)
-  let blueGradient = ctx.createLinearGradient(w - 180, 0, w, 0);
+  // Right Panel (Blue) — simple horizontal rectangle
+  let blueGradient = ctx.createLinearGradient(w - 160, 0, w, 0);
   blueGradient.addColorStop(0, "#1976D2");
   blueGradient.addColorStop(1, "#64B5F6");
-  ctx.beginPath();
-  ctx.moveTo(w, 0);
-  ctx.lineTo(w - 320, 0);
-  ctx.lineTo(w - 290, h);
-  ctx.lineTo(w, h);
-  ctx.closePath();
   ctx.fillStyle = blueGradient;
-  ctx.fill();
+  ctx.fillRect(w - 160, 0, 160, h);
 
-  // Center Box
+  // Center Box — simple horizontal rectangle
   ctx.fillStyle = "#333";
-  ctx.fillRect((w - 140) / 2, 10, 140, 50);
+  const centerBoxWidth = 140;
+  ctx.fillRect((w - centerBoxWidth) / 2, 10, centerBoxWidth, 40);
 
   // Text
   ctx.fillStyle = "#fff";
