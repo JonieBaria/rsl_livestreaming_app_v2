@@ -116,33 +116,21 @@ function renderOverlay() {
   ctx.closePath();
   ctx.fill();
 
-  // === Left panel (red) — sharp edges ===
-  let redGradient = ctx.createLinearGradient(0, 0, 200, 0);
-  redGradient.addColorStop(0, "#FF5252");
-  redGradient.addColorStop(1, "#D32F2F");
-  ctx.beginPath();
-  ctx.moveTo(0, 0);
-  ctx.lineTo(300, 0);
-  ctx.lineTo(270, h);
-  ctx.lineTo(0, h);
-  ctx.closePath();
-  ctx.fillStyle = redGradient;
-  ctx.fill();
+  // === Left panel (red) — no slant, just rectangle ===
+  const leftPanelW = 300;
+  ctx.fillStyle = ctx.createLinearGradient(0, 0, 200, 0);
+  ctx.fillStyle.addColorStop(0, "#FF5252");
+  ctx.fillStyle.addColorStop(1, "#D32F2F");
+  ctx.fillRect(0, 0, leftPanelW, h);
 
-  // === Right panel (blue) — sharp edges ===
-  let blueGradient = ctx.createLinearGradient(w - 200, 0, w, 0);
-  blueGradient.addColorStop(0, "#1976D2");
-  blueGradient.addColorStop(1, "#64B5F6");
-  ctx.beginPath();
-  ctx.moveTo(w, 0);
-  ctx.lineTo(w - 300, 0);
-  ctx.lineTo(w - 270, h);
-  ctx.lineTo(w, h);
-  ctx.closePath();
-  ctx.fillStyle = blueGradient;
-  ctx.fill();
+  // === Right panel (blue) — no slant, just rectangle ===
+  const rightPanelW = 300;
+  ctx.fillStyle = ctx.createLinearGradient(w - 200, 0, w, 0);
+  ctx.fillStyle.addColorStop(0, "#1976D2");
+  ctx.fillStyle.addColorStop(1, "#64B5F6");
+  ctx.fillRect(w - rightPanelW, 0, rightPanelW, h);
 
-  // === Center box (overlapping both panels) ===
+  // === Center box ===
   const centerW = 150;
   ctx.fillStyle = "#111";
   ctx.fillRect((w - centerW) / 2, 0, centerW, h);
@@ -206,7 +194,7 @@ function draw() {
   const overlayW = textCanvas.width;
   const overlayH = textCanvas.height;
   const overlayX = (canvas.width - overlayW) / 2;
-  const overlayY = canvas.height * 0.03; // slight top margin
+  const overlayY = canvas.height * 0.03;
 
   gl.viewport(overlayX, overlayY, overlayW, overlayH);
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
