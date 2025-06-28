@@ -73,6 +73,9 @@ function setupTexture(tex) {
 setupTexture(videoTexture);
 setupTexture(overlayTexture);
 
+const logoImage = new Image();
+logoImage.src = "RSL.png"; // or your real logo path
+
 // === Canvas overlay for text & scorebug ===
 const textCanvas = document.createElement("canvas");
 const ctx = textCanvas.getContext("2d");
@@ -92,13 +95,13 @@ function renderOverlay() {
   const w = (textCanvas.width = 700);
   const h = 60;
   const leagueBarHeight = 24;
-  const totalHeight = h + leagueBarHeight;
+  const logoSize = 40; // size of the logo
+  const totalHeight = h + leagueBarHeight + logoSize + 8; // extra margin below logo
 
-  textCanvas.height = totalHeight; // Make sure to include league bar height
-
+  textCanvas.height = totalHeight;
   ctx.clearRect(0, 0, w, totalHeight);
 
-  // Shadow for main scorebug
+  // Shadow for scorebug
   ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
   ctx.shadowBlur = 12;
   ctx.shadowOffsetX = 0;
@@ -146,7 +149,7 @@ function renderOverlay() {
   ctx.fillStyle = blueGradient;
   ctx.fill();
 
-  // Center black box for score
+  // Center box for score
   const centerW = 150;
   ctx.fillStyle = "#111";
   ctx.fillRect((w - centerW) / 2, 0, centerW, h);
@@ -159,21 +162,27 @@ function renderOverlay() {
   ctx.fillText(leftName, 130, h / 2);
   ctx.fillText(rightName, w - 130, h / 2);
 
-  // Score text
+  // Score
   ctx.font = "bold 36px Arial";
   ctx.fillText(`${leftScore} - ${rightScore}`, w / 2, h / 2);
 
-  // Separate league bar below
+  // League bar
   ctx.shadowBlur = 6;
   ctx.fillStyle = "#000";
   ctx.fillRect(0, h, w, leagueBarHeight);
 
-  // League text in separate bar
+  // League text
   ctx.fillStyle = "#bbb";
   ctx.font = "900 15px Arial";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText("RIZAL SPORTS LEAGUE", w / 2, h + leagueBarHeight / 2);
+
+  // Draw logo below league bar on bottom-left
+  if (logoImage.complete) {
+    ctx.shadowBlur = 4; // subtle logo shadow
+    ctx.drawImage(logoImage, 10, h + leagueBarHeight + 4, logoSize, logoSize);
+  }
 }
 
 // === Camera Video Setup ===
