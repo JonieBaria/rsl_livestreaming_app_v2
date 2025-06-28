@@ -176,34 +176,18 @@ function renderOverlay() {
   ctx.fillText("RIZAL SPORTS LEAGUE", w / 2, h + leagueBarHeight / 2);
 }
 
-// === Camera Setup ===
-const constraints = {
-  video: {
-    facingMode: { exact: "environment" },
-    width: { ideal: 1280 },
-    height: { ideal: 720 },
-    frameRate: { ideal: 30, max: 60 },
-  },
-  audio: true,
-};
-
+// === Camera Video Setup ===
 const video = document.getElementById("debugVideo");
 navigator.mediaDevices
   .getUserMedia({ video: true })
   .then((stream) => {
     video.srcObject = stream;
     video.play();
-    video.onloadeddata = () => {
-      if (logoImage.complete) {
-        requestAnimationFrame(draw);
-      } else {
-        logoImage.onload = () => requestAnimationFrame(draw);
-      }
-    };
+    video.onloadeddata = () => requestAnimationFrame(draw);
   })
   .catch((err) => alert("Camera access denied: " + err.message));
 
-// === Render Loop ===
+// === WebGL Draw Loop ===
 function draw() {
   gl.viewport(0, 0, canvas.width, canvas.height);
   gl.clear(gl.COLOR_BUFFER_BIT);
@@ -215,29 +199,6 @@ function draw() {
   }
 
   renderOverlay();
-  renderLogo();
-  gl.bindTexture(gl.TEXTURE_2D, logoTexture);
-  gl.texImage2D(
-    gl.TEXTURE_2D,
-    0,
-    gl.RGBA,
-    gl.RGBA,
-    gl.UNSIGNED_BYTE,
-    logoCanvas
-  );
-
-  // Set viewport to bottom-left corner
-  const logoW = logoCanvas.width;
-  const logoH = logoCanvas.height;
-  const margin = 30;
-  gl.viewport(
-    canvas.width - logoW - margin, // x position from right
-    canvas.height - logoH - margin, // y position from top (WebGL origin is bottom-left)
-    logoW,
-    logoH
-  );
-  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-
   gl.bindTexture(gl.TEXTURE_2D, overlayTexture);
   gl.texImage2D(
     gl.TEXTURE_2D,
@@ -252,6 +213,7 @@ function draw() {
   const overlayH = textCanvas.height;
   const overlayX = (canvas.width - overlayW) / 2;
   const overlayY = canvas.height * 0.03;
+
   gl.viewport(overlayX, overlayY, overlayW, overlayH);
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
