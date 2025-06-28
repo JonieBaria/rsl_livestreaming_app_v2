@@ -105,59 +105,63 @@ function renderOverlay() {
   const h = (textCanvas.height = 60);
   ctx.clearRect(0, 0, w, h);
 
-  // Shadow
+  // Shadow for entire bug
   ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
-  ctx.shadowBlur = 20;
+  ctx.shadowBlur = 12;
   ctx.shadowOffsetX = 0;
-  ctx.shadowOffsetY = 6;
+  ctx.shadowOffsetY = 4;
 
-  let redGradient = ctx.createLinearGradient(0, 0, 180, 0);
+  // Left Panel (Red) — sharper slant inward
+  let redGradient = ctx.createLinearGradient(0, 0, 200, 0);
   redGradient.addColorStop(0, "#FF5252");
   redGradient.addColorStop(1, "#D32F2F");
   ctx.beginPath();
-  ctx.moveTo(0, 0); // top-left corner
-  ctx.lineTo(320, 0); // top-right corner of red panel
-  ctx.lineTo(290, h); // slanted bottom-right edge (closer to center)
-  ctx.lineTo(0, h); // bottom-left corner
+  ctx.moveTo(0, 0); // top-left
+  ctx.lineTo(300, 0); // top-right of red
+  ctx.lineTo(270, h); // slanted bottom-right closer to center
+  ctx.lineTo(0, h); // bottom-left
   ctx.closePath();
   ctx.fillStyle = redGradient;
   ctx.fill();
 
-  // Right Panel (Blue) — slant on the left edge
-  let blueGradient = ctx.createLinearGradient(w - 180, 0, w, 0);
+  // Right Panel (Blue) — sharper slant inward
+  let blueGradient = ctx.createLinearGradient(w - 200, 0, w, 0);
   blueGradient.addColorStop(0, "#1976D2");
   blueGradient.addColorStop(1, "#64B5F6");
   ctx.beginPath();
-  ctx.moveTo(w, 0); // top-right corner
-  ctx.lineTo(w - 320, 0); // top-left corner of blue panel
-  ctx.lineTo(w - 290, h); // slanted bottom-left edge (closer to center)
-  ctx.lineTo(w, h); // bottom-right corner
+  ctx.moveTo(w, 0); // top-right
+  ctx.lineTo(w - 300, 0); // top-left of blue
+  ctx.lineTo(w - 270, h); // slanted bottom-left closer to center
+  ctx.lineTo(w, h); // bottom-right
   ctx.closePath();
   ctx.fillStyle = blueGradient;
   ctx.fill();
 
-  // Center Box
-  ctx.fillStyle = "#333";
-  ctx.fillRect((w - 140) / 2, 10, 140, 50);
+  // Center Box — dark, bold, full height
+  const centerW = 150;
+  ctx.fillStyle = "#222";
+  ctx.fillRect((w - centerW) / 2, 0, centerW, h);
 
-  // Text
+  // Team Names — bigger, more modern font, tighter to center
   ctx.fillStyle = "#fff";
-  ctx.font = "bold 36px Arial";
+  ctx.font = "bold 30px Arial";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText(leftName, 120, h / 2);
-  ctx.fillText(rightName, w - 120, h / 2);
+  ctx.fillText(leftName, 130, h / 2);
+  ctx.fillText(rightName, w - 130, h / 2);
 
-  ctx.font = "bold 30px Arial";
+  // Score — big and centered
+  ctx.font = "bold 36px Arial";
   ctx.fillText(`${leftScore} - ${rightScore}`, w / 2, h / 2);
 
+  // League Tag — small, below scorebox
   ctx.shadowColor = "#444";
   ctx.shadowBlur = 2;
   ctx.shadowOffsetX = 1;
   ctx.shadowOffsetY = 1;
-  ctx.font = "900 15px Arial";
+  ctx.font = "900 14px Arial";
   ctx.fillStyle = "#bbb";
-  ctx.fillText("RSL", w / 2, h - 10);
+  ctx.fillText("RIZAL SPORTS LEAGUE", w / 2, h - 10);
 
   //   // Draw Logo (Bottom-left)
   //   const logoSize = 50;
