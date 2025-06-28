@@ -103,46 +103,64 @@ function renderOverlay() {
   const rightName = document.getElementById("rightTeamName").value;
   const w = (textCanvas.width = 700);
   const h = (textCanvas.height = 60);
-  ctx.clearRect(0, 0, w, h);
+  const leagueBarHeight = 24; // separate box below
 
-  // Shadow for entire bug
+  ctx.clearRect(0, 0, w, h + leagueBarHeight);
+
+  // Shadow for entire scorebug
   ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
   ctx.shadowBlur = 12;
   ctx.shadowOffsetX = 0;
   ctx.shadowOffsetY = 4;
 
-  // Left Panel (Red) — sharper slant inward
+  // Draw rounded rectangle background for whole top scorebug
+  const radius = 12;
+  ctx.fillStyle = "#222";
+  ctx.beginPath();
+  ctx.moveTo(radius, 0);
+  ctx.lineTo(w - radius, 0);
+  ctx.quadraticCurveTo(w, 0, w, radius);
+  ctx.lineTo(w, h - radius);
+  ctx.quadraticCurveTo(w, h, w - radius, h);
+  ctx.lineTo(radius, h);
+  ctx.quadraticCurveTo(0, h, 0, h - radius);
+  ctx.lineTo(0, radius);
+  ctx.quadraticCurveTo(0, 0, radius, 0);
+  ctx.closePath();
+  ctx.fill();
+
+  // Red left panel inside rounded area
   let redGradient = ctx.createLinearGradient(0, 0, 200, 0);
   redGradient.addColorStop(0, "#FF5252");
   redGradient.addColorStop(1, "#D32F2F");
   ctx.beginPath();
-  ctx.moveTo(0, 0); // top-left
-  ctx.lineTo(300, 0); // top-right of red
-  ctx.lineTo(270, h); // slanted bottom-right closer to center
-  ctx.lineTo(0, h); // bottom-left
+  ctx.moveTo(0, 0);
+  ctx.lineTo(300, 0);
+  ctx.lineTo(270, h);
+  ctx.lineTo(0, h);
   ctx.closePath();
   ctx.fillStyle = redGradient;
   ctx.fill();
 
-  // Right Panel (Blue) — sharper slant inward
+  // Blue right panel inside rounded area
   let blueGradient = ctx.createLinearGradient(w - 200, 0, w, 0);
   blueGradient.addColorStop(0, "#1976D2");
   blueGradient.addColorStop(1, "#64B5F6");
   ctx.beginPath();
-  ctx.moveTo(w, 0); // top-right
-  ctx.lineTo(w - 300, 0); // top-left of blue
-  ctx.lineTo(w - 270, h); // slanted bottom-left closer to center
-  ctx.lineTo(w, h); // bottom-right
+  ctx.moveTo(w, 0);
+  ctx.lineTo(w - 300, 0);
+  ctx.lineTo(w - 270, h);
+  ctx.lineTo(w, h);
   ctx.closePath();
   ctx.fillStyle = blueGradient;
   ctx.fill();
 
-  // Center Box — dark, bold, full height
+  // Center box (still over full height)
   const centerW = 150;
-  ctx.fillStyle = "#222";
+  ctx.fillStyle = "#111";
   ctx.fillRect((w - centerW) / 2, 0, centerW, h);
 
-  // Team Names — bigger, more modern font, tighter to center
+  // Team Names
   ctx.fillStyle = "#fff";
   ctx.font = "bold 30px Arial";
   ctx.textAlign = "center";
@@ -150,24 +168,21 @@ function renderOverlay() {
   ctx.fillText(leftName, 130, h / 2);
   ctx.fillText(rightName, w - 130, h / 2);
 
-  // Score — big and centered
+  // Score
   ctx.font = "bold 36px Arial";
   ctx.fillText(`${leftScore} - ${rightScore}`, w / 2, h / 2);
 
-  // League Tag — small, below scorebox
-  ctx.shadowColor = "#444";
-  ctx.shadowBlur = 2;
-  ctx.shadowOffsetX = 1;
-  ctx.shadowOffsetY = 1;
-  ctx.font = "900 14px Arial";
-  ctx.fillStyle = "#bbb";
-  ctx.fillText("RIZAL SPORTS LEAGUE", w / 2, h - 10);
+  // Separate league box below
+  ctx.shadowBlur = 6; // subtle shadow for bar
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0, h, w, leagueBarHeight);
 
-  //   // Draw Logo (Bottom-left)
-  //   const logoSize = 50;
-  //   if (logoImage.complete) {
-  //     ctx.drawImage(logoImage, 10, h - logoSize - 5, logoSize, logoSize);
-  //   }
+  // League text inside bar
+  ctx.fillStyle = "#bbb";
+  ctx.font = "900 15px Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("RIZAL SPORTS LEAGUE", w / 2, h + leagueBarHeight / 2);
 }
 
 function renderLogo() {
