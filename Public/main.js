@@ -5,6 +5,7 @@ if (!gl) throw new Error("WebGL not supported");
 canvas.width = 1280;
 canvas.height = 720;
 
+// Enable transparency
 gl.enable(gl.BLEND);
 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
@@ -72,15 +73,7 @@ function setupTexture(tex) {
 setupTexture(videoTexture);
 setupTexture(overlayTexture);
 
-const logoCanvas = document.createElement("canvas");
-logoCanvas.width = 70;
-logoCanvas.height = 70;
-const logoCtx = logoCanvas.getContext("2d");
-
-const logoTexture = gl.createTexture();
-setupTexture(logoTexture);
-
-// === Logo and Canvas ===
+// === Canvas overlay for text & scorebug ===
 const textCanvas = document.createElement("canvas");
 const ctx = textCanvas.getContext("2d");
 
@@ -88,32 +81,30 @@ let leftScore = 0;
 let rightScore = 0;
 
 function addScore(side, points) {
-  if (side === "left") {
-    leftScore += points;
-  } else if (side === "right") {
-    rightScore += points;
-  }
+  if (side === "left") leftScore += points;
+  else if (side === "right") rightScore += points;
 }
 
-const logoImage = new Image();
-logoImage.src = "RSL.png"; // Change to your logo path
-
+// === Overlay Rendering ===
 function renderOverlay() {
   const leftName = document.getElementById("leftTeamName").value;
   const rightName = document.getElementById("rightTeamName").value;
   const w = (textCanvas.width = 700);
-  const h = (textCanvas.height = 60);
-  const leagueBarHeight = 24; // separate box below
+  const h = 60;
+  const leagueBarHeight = 24;
+  const totalHeight = h + leagueBarHeight;
 
-  ctx.clearRect(0, 0, w, h + leagueBarHeight);
+  textCanvas.height = totalHeight; // Make sure to include league bar height
 
-  // Shadow for entire scorebug
+  ctx.clearRect(0, 0, w, totalHeight);
+
+  // Shadow for main scorebug
   ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
   ctx.shadowBlur = 12;
   ctx.shadowOffsetX = 0;
   ctx.shadowOffsetY = 4;
 
-  // Draw rounded rectangle background for whole top scorebug
+  // Rounded rectangle background
   const radius = 12;
   ctx.fillStyle = "#222";
   ctx.beginPath();
@@ -129,7 +120,7 @@ function renderOverlay() {
   ctx.closePath();
   ctx.fill();
 
-  // Red left panel inside rounded area
+  // Red left panel
   let redGradient = ctx.createLinearGradient(0, 0, 200, 0);
   redGradient.addColorStop(0, "#FF5252");
   redGradient.addColorStop(1, "#D32F2F");
@@ -142,7 +133,7 @@ function renderOverlay() {
   ctx.fillStyle = redGradient;
   ctx.fill();
 
-  // Blue right panel inside rounded area
+  // Blue right panel
   let blueGradient = ctx.createLinearGradient(w - 200, 0, w, 0);
   blueGradient.addColorStop(0, "#1976D2");
   blueGradient.addColorStop(1, "#64B5F6");
@@ -155,7 +146,7 @@ function renderOverlay() {
   ctx.fillStyle = blueGradient;
   ctx.fill();
 
-  // Center box (still over full height)
+  // Center black box for score
   const centerW = 150;
   ctx.fillStyle = "#111";
   ctx.fillRect((w - centerW) / 2, 0, centerW, h);
@@ -168,36 +159,21 @@ function renderOverlay() {
   ctx.fillText(leftName, 130, h / 2);
   ctx.fillText(rightName, w - 130, h / 2);
 
-  // Score
+  // Score text
   ctx.font = "bold 36px Arial";
   ctx.fillText(`${leftScore} - ${rightScore}`, w / 2, h / 2);
 
-  // Separate league box below
-  ctx.shadowBlur = 6; // subtle shadow for bar
+  // Separate league bar below
+  ctx.shadowBlur = 6;
   ctx.fillStyle = "#000";
   ctx.fillRect(0, h, w, leagueBarHeight);
 
-  // League text inside bar
+  // League text in separate bar
   ctx.fillStyle = "#bbb";
   ctx.font = "900 15px Arial";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText("RIZAL SPORTS LEAGUE", w / 2, h + leagueBarHeight / 2);
-}
-
-function renderLogo() {
-  logoCtx.clearRect(0, 0, logoCanvas.width, logoCanvas.height);
-
-  const logoSize = 70;
-  if (logoImage.complete) {
-    logoCtx.drawImage(
-      logoImage,
-      0,
-      logoCanvas.height - logoSize,
-      logoSize,
-      logoSize
-    );
-  }
 }
 
 // === Camera Setup ===
