@@ -165,7 +165,7 @@ function renderOverlay() {
 
 // === Camera setup ===
 const video = document.getElementById("debugVideo");
-navigator.mediaDevices
+const canvasStream = await navigator.mediaDevices
   .getUserMedia({ video: true })
   .then((stream) => {
     video.srcObject = stream;
