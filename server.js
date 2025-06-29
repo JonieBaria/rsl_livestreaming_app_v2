@@ -18,14 +18,14 @@ wss.on("connection", (ws) => {
     "-re",
     "-f",
     "webm",
-    "-r",
-    "30",
     "-i",
     "pipe:0",
-    "-f",
-    "lavfi",
-    "-i",
-    "anullsrc=channel_layout=stereo:sample_rate=44100",
+
+    "-map",
+    "0:v:0", // video from input 0
+    "-map",
+    "0:a:0", // audio from input 0
+
     "-c:v",
     "libx264",
     "-preset",
@@ -42,12 +42,14 @@ wss.on("connection", (ws) => {
     "30",
     "-r",
     "30",
+
     "-c:a",
     "aac",
     "-b:a",
     "128k",
     "-ar",
     "44100",
+
     "-f",
     "flv",
     "rtmps://live-api-s.facebook.com:443/rtmp/FB-665053932562556-0-Ab1eyRCvkkMP4LJ3Wd6xIHiq",
