@@ -240,7 +240,7 @@ async function setupStreams() {
       alert("MediaRecorder not supported: " + e.message);
       return;
     }
-
+    const socket = new WebSocket("wss://rsl-livestream-lwkk.onrender.com");
     recorder.ondataavailable = (e) => {
       if (e.data.size > 0 && socket.readyState === WebSocket.OPEN) {
         socket.send(e.data);
