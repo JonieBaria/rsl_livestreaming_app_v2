@@ -165,67 +165,48 @@ function renderOverlay() {
 
 // === Camera setup ===
 const video = document.getElementById("debugVideo");
-const canvasStream = await navigator.mediaDevices
-  .getUserMedia({ video: true })
-  .then((stream) => {
-    video.srcObject = stream;
+async function setupStreams() {
+  try {
+    // Start camera video stream
+    const videoStream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+    });
+    video.srcObject = videoStream;
     video.play();
     video.onloadeddata = () => requestAnimationFrame(draw);
-  })
-  .catch((err) => alert("Camera access denied: " + err.message));
 
-const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    // Start microphone audio stream
+    const audioStream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+    });
 
-function draw() {
-  gl.viewport(0, 0, canvas.width, canvas.height);
-  gl.clear(gl.COLOR_BUFFER_BIT);
+    // Combine both streams into one
+    const combinedStream = new MediaStream([
+      ...canvas.captureStream(30).getVideoTracks(),
+      ...audioStream.getAudioTracks(),
+    ]);
 
-  if (video.readyState >= 2) {
-    gl.bindTexture(gl.TEXTURE_2D, videoTexture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    // Create MediaRecorder
+    let recorder;
+    try {
+      recorder = new MediaRecorder(combinedStream, {
+        mimeType: "video/webm;codecs=vp8,opus",
+      });
+    } catch (e) {
+      alert("MediaRecorder not supported: " + e.message);
+      return;
+    }
+
+    recorder.ondataavailable = (e) => {
+      if (e.data.size > 0 && socket.readyState === WebSocket.OPEN) {
+        socket.send(e.data);
+      }
+    };
+    recorder.start(100);
+  } catch (err) {
+    alert("Error accessing media devices: " + err.message);
   }
-
-  renderOverlay();
-  gl.bindTexture(gl.TEXTURE_2D, overlayTexture);
-  gl.texImage2D(
-    gl.TEXTURE_2D,
-    0,
-    gl.RGBA,
-    gl.RGBA,
-    gl.UNSIGNED_BYTE,
-    textCanvas
-  );
-
-  const overlayW = textCanvas.width;
-  const overlayH = textCanvas.height;
-  const overlayX = (canvas.width - overlayW) / 2;
-  const overlayY = canvas.height * 0.03;
-
-  gl.viewport(overlayX, overlayY, overlayW, overlayH);
-  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-
-  gl.viewport(0, 0, canvas.width, canvas.height);
-  requestAnimationFrame(draw);
 }
 
-const combinedStream = new MediaStream([
-  ...canvasStream.getVideoTracks(),
-  ...audioStream.getAudioTracks(),
-]);
-
-let recorder;
-try {
-  recorder = new MediaRecorder(combinedStream, {
-    mimeType: "video/webm;codecs=vp8,opus",
-  });
-} catch (e) {
-  alert("MediaRecorder not supported.");
-}
-const socket = new WebSocket("wss://rsl-livestream-lwkk.onrender.com");
-recorder.ondataavailable = (e) => {
-  if (e.data.size > 0 && socket.readyState === WebSocket.OPEN) {
-    socket.send(e.data);
-  }
-};
-recorder.start(100);
+// Call the async setup function
+setupStreams();
