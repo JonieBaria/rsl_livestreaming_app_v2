@@ -52,7 +52,7 @@ wss.on("connection", (ws) => {
 
     "-f",
     "flv",
-    "rtmps://live-api-s.facebook.com:443/rtmp/FB-2940425532795919-0-Ab0KAc1oWmmSkr1E3rheSKZF",
+    "rtmps://live-api-s.facebook.com:443/rtmp/FB-2834333273405146-0-Ab3AKi6NIX-BA7VZMMoLMgGx",
     // "rtmps://live-api-s.facebook.com:443/rtmp/FB-665053932562556-0-Ab1eyRCvkkMP4LJ3Wd6xIHiq",
   ]);
 
