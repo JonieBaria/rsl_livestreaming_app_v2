@@ -77,10 +77,19 @@ const ctx = textCanvas.getContext("2d");
 
 let leftScore = 0;
 let rightScore = 0;
+let gametype = "";
 
 function addScore(side, points) {
   if (side === "left") leftScore += points;
   else if (side === "right") rightScore += points;
+}
+
+function minusScore(side, points) {
+  if (side === "left") {
+    leftScore = Math.max(0, leftScore - points);
+  } else if (side === "right") {
+    rightScore = Math.max(0, rightScore - points);
+  }
 }
 
 function renderOverlay() {
@@ -160,7 +169,11 @@ function renderOverlay() {
   ctx.font = "900 15px Arial";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText("RIZAL SPORTS LEAGUE", w / 2, h + leagueBarHeight / 2);
+  ctx.fillText(
+    `COMPANY SPORTSFEST 2025 - ${gametype}`,
+    w / 2,
+    h + leagueBarHeight / 2
+  );
 }
 
 // === Camera setup ===
