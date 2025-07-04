@@ -213,7 +213,9 @@ async function setupStreams() {
   try {
     // Start camera video stream
     const videoStream = await navigator.mediaDevices.getUserMedia({
-      video: true,
+      video: {
+        facingMode: { ideal: "environment" }, // request rear camera
+      },
     });
     video.srcObject = videoStream;
     video.play();
