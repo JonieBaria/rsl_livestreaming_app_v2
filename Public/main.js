@@ -94,6 +94,7 @@ function minusScore(side, points) {
 
 function renderOverlay() {
   const leftName = document.getElementById("leftTeamName").value;
+  const gametype = document.getElementById("gametype").value;
   const rightName = document.getElementById("rightTeamName").value;
   const w = (textCanvas.width = 700);
   const h = 60;
