@@ -96,6 +96,8 @@ function renderOverlay() {
   const leftName = document.getElementById("leftTeamName").value;
   const gametype = document.getElementById("gametype").value;
   const rightName = document.getElementById("rightTeamName").value;
+  const leagueName = document.getElementById("leaguename").value;
+  const quarter = document.getElementById("gameQuarter").value;
   const w = (textCanvas.width = 700);
   const h = 60;
   const leagueBarHeight = 24;
@@ -171,7 +173,7 @@ function renderOverlay() {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(
-    `COMPANY SPORTSFEST 2025 - ${gametype}`,
+    ` ${leagueName} - ${gametype} - ${quarter}`,
     w / 2,
     h + leagueBarHeight / 2
   );

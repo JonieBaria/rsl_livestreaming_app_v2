@@ -4,106 +4,101 @@
     <meta charset="UTF-8" />
     <title>WebGL Fixed Size Camera + Text Overlay</title>
     <style>
+      body {
+        margin: 0;
+        font-family: sans-serif;
+        background: #111;
+        color: white;
+        display: flex;
+        flex-direction: row;
+        height: 100vh;
+        overflow: hidden;
+      }
 
-  body {
-    margin: 0;
-    font-family: sans-serif;
-    background: #111;
-    color: white;
-    display: flex;
-    flex-direction: row;
-    height: 100vh;
-    overflow: hidden;
-  }
+      #glcanvas {
+        width: 50vw;
+        height: 70vh;
+        display: block;
+      }
 
-  #glcanvas {
-    width: 50vw;
-    height: 70vh;
-    display: block;
-  }
+      #controls {
+        width: 50vw;
+        padding: 20px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
 
-  #controls {
-    width: 50vw;
-    padding: 20px;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
+      .score-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
 
-  .score-controls {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
+      .score-controls h3 {
+        margin: 0;
+      }
 
-  .score-controls h3 {
-    margin: 0;
-  }
+      .team-section {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background: #222;
+        padding: 10px;
+        border-radius: 8px;
+      }
 
-  .team-section {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    background: #222;
-    padding: 10px;
-    border-radius: 8px;
-  }
+      button {
+        margin: 6px;
+        padding: 16px 28px; /* even bigger buttons */
+        font-size: 26px; /* larger text */
+        cursor: pointer;
+        border-radius: 12px;
+        background: #444;
+        color: white;
+        border: none;
+        transition: background 0.2s;
+      }
 
-button {
-  margin: 6px;
-  padding: 16px 28px;         /* even bigger buttons */
-  font-size: 26px;            /* larger text */
-  cursor: pointer;
-  border-radius: 12px;
-  background: #444;
-  color: white;
-  border: none;
-  transition: background 0.2s;
-}
+      input[type="text"] {
+        font-size: 20px; /* bigger text inputs */
+        padding: 8px;
+        width: 100%;
+        box-sizing: border-box;
+      }
 
+      video {
+        display: none;
+      }
 
+      /* Responsive adjustments for landscape mobile screens */
+      @media screen and (orientation: landscape) and (max-height: 768px) {
+        body {
+          flex-direction: row;
+        }
 
+        #glcanvas {
+          width: 50%;
+          height: 100vh;
+        }
 
-  input[type="text"] {
-    font-size: 20px;            /* bigger text inputs */
-    padding: 8px;
-    width: 100%;
-    box-sizing: border-box;
-  }
+        #controls {
+          width: 50%;
+          padding: 30px;
+          gap: 30px;
+        }
 
-  video {
-    display: none;
-  }
+        button {
+          font-size: 24px;
+          padding: 16px 24px;
+        }
 
-  /* Responsive adjustments for landscape mobile screens */
-  @media screen and (orientation: landscape) and (max-height: 768px) {
-    body {
-      flex-direction: row;
-    }
-
-    #glcanvas {
-      width: 50%;
-      height: 100vh;
-    }
-
-    #controls {
-      width: 50%;
-      padding: 30px;
-      gap: 30px;
-    }
-
-    button {
-      font-size: 24px;
-      padding: 16px 24px;
-    }
-
-    input[type="text"] {
-      font-size: 24px;
-      padding: 10px;
-    }
-  }
-</style>
+        input[type="text"] {
+          font-size: 24px;
+          padding: 10px;
+        }
+      }
     </style>
   </head>
   <body>
@@ -111,9 +106,32 @@ button {
 
     <div id="controls">
       <h2>Controls</h2>
-      <input type="text" id="gametype" value="" />
-      <div class="team-section">
 
+      <label>League Name:</label>
+      <input type="text" id="leaguename" value="Your League" />
+      <input type="text" id="gametype" value="" />
+      <label>Game Quarter:</label>
+      <select id="gameQuarter">
+        <option value="EARLY 1ST QTR">EARLY 1ST QTR</option>
+        <option value="MID 1ST QTR">MID 1ST QTR</option>
+        <option value="LATE 1ST QTR">LATE 1ST QTR</option>
+
+        <option value="EARLY 2ND QTR">EARLY 2ND QTR</option>
+        <option value="MID 2ND QTR">MID 2ND QTR</option>
+        <option value="LATE 2ND QTR">LATE 2ND QTR</option>
+
+        <option value="EARLY 3RD QTR">EARLY 3RD QTR</option>
+        <option value="MID 3RD QTR">MID 3RD QTR</option>
+        <option value="LATE 3RD QTR">LATE 3RD QTR</option>
+
+        <option value="EARLY 4TH QTR">EARLY 4TH QTR</option>
+        <option value="MID 4TH QTR">MID 4TH QTR</option>
+        <option value="LATE 4TH QTR">LATE 4TH QTR</option>
+        <option value="OT">OT1</option>
+        <option value="OT2">OT2</option>
+        <option value="OT3">OT3</option>
+      </select>
+      <div class="team-section">
         <label>Left Team Name:</label>
         <input type="text" id="leftTeamName" value="TEAM A" />
         <div class="score-controls">
@@ -128,30 +146,6 @@ button {
       </div>
 
       <div class="team-section">
-        <label>League Name:</label>
-        <input type="text" id="leaguename" value="Your League" />
-        <label>Game Quarter:</label>
-        <select id="gameQuarter">
-
-    <option value="EARLY 1ST QTR">EARLY 1ST QTR</option>
-    <option value="MID 1ST QTR">MID 1ST QTR</option>
-    <option value="LATE 1ST QTR">LATE 1ST QTR</option>
-
-    <option value="EARLY 2ND QTR">EARLY 2ND QTR</option>
-    <option value="MID 2ND QTR">MID 2ND QTR</option>
-    <option value="LATE 2ND QTR">LATE 2ND QTR</option>
-
-    <option value="EARLY 3RD QTR">EARLY 3RD QTR</option>
-    <option value="MID 3RD QTR">MID 3RD QTR</option>
-    <option value="LATE 3RD QTR">LATE 3RD QTR</option>
-
-    <option value="EARLY 4TH QTR">EARLY 4TH QTR</option>
-    <option value="MID 4TH QTR">MID 4TH QTR</option>
-    <option value="LATE 4TH QTR">LATE 4TH QTR</option>
-    <option value="OT">OT1</option>
-    <option value="OT2">OT2</option>
-    <option value="OT3">OT3</option>
-  </select>
         <label>Right Team Name:</label>
         <input type="text" id="rightTeamName" value="TEAM B" />
         <div class="score-controls">
