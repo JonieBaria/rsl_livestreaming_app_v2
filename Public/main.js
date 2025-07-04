@@ -132,18 +132,18 @@ function renderOverlay() {
 
   // === Left panel (red) — rectangle ===
   const leftPanelW = 300;
-  let redGradient = ctx.createLinearGradient(0, 0, 200, 0);
-  redGradient.addColorStop(0, "#FF5252");
-  redGradient.addColorStop(1, "#D32F2F");
-  ctx.fillStyle = redGradient;
+  let orangeGradientLeft = ctx.createLinearGradient(0, 0, 200, 0);
+  orangeGradientLeft.addColorStop(0, "#FF9800"); // bright orange
+  orangeGradientLeft.addColorStop(1, "#F57C00"); // deeper orange
+  ctx.fillStyle = orangeGradientLeft;
   ctx.fillRect(0, 0, leftPanelW, h);
 
   // === Right panel (blue) — rectangle ===
   const rightPanelW = 300;
-  let blueGradient = ctx.createLinearGradient(w - 200, 0, w, 0);
-  blueGradient.addColorStop(0, "#1976D2");
-  blueGradient.addColorStop(1, "#64B5F6");
-  ctx.fillStyle = blueGradient;
+  let orangeGradientRight = ctx.createLinearGradient(w - 200, 0, w, 0);
+  orangeGradientRight.addColorStop(0, "#FF9800"); // bright orange
+  orangeGradientRight.addColorStop(1, "#F57C00"); // deeper orange
+  ctx.fillStyle = orangeGradientRight;
   ctx.fillRect(w - rightPanelW, 0, rightPanelW, h);
 
   // === Center box ===
