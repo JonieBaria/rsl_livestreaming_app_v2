@@ -261,10 +261,12 @@ function draw() {
     const aspectRatio = adImage.width / adImage.height;
     const targetW = targetH * aspectRatio;
 
-    const adX = (canvas.width - adW) / 2;
-    const adY = (canvas.height - adH) / 2;
+    // Center position
+    const adX = (canvas.width - targetW) / 2;
+    const adY = (canvas.height - targetH) / 2;
 
-    gl.viewport(adX, adY, adW, adH);
+    // Use calculated values
+    gl.viewport(adX, adY, targetW, targetH);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
 
