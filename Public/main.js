@@ -75,16 +75,16 @@ setupTexture(videoTexture);
 setupTexture(overlayTexture);
 setupTexture(adTexture);
 
-// === Ad Image Setup ===
-const adImage = new Image();
-adImage.src = "ad.png"; // Change to your ad image path
+// === Ad Images Setup ===
+const adImages = ["ad1.png", "ad2.png"];
+let currentAdIndex = 0;
 let showAd = false;
+let adImage = new Image();
+let autoHideTimeout;
 
-document.getElementById("showAdBtn").addEventListener("click", () => {
-  showAd = true;
-
-  // Refresh texture (in case image is already loaded)
-  if (adImage.complete) {
+function loadAdImage(index) {
+  adImage.src = adImages[index];
+  adImage.onload = () => {
     gl.bindTexture(gl.TEXTURE_2D, adTexture);
     gl.texImage2D(
       gl.TEXTURE_2D,
@@ -94,27 +94,32 @@ document.getElementById("showAdBtn").addEventListener("click", () => {
       gl.UNSIGNED_BYTE,
       adImage
     );
-  }
+  };
+}
+loadAdImage(currentAdIndex);
 
-  // Auto-hide after 5 seconds
+document.getElementById("showAdBtn").addEventListener("click", () => {
+  showAd = true;
+  currentAdIndex = 0;
+  loadAdImage(currentAdIndex);
+  cycleAds();
+});
+
+function cycleAds() {
+  if (currentAdIndex >= adImages.length) {
+    showAd = false;
+    return;
+  }
+  showAd = true;
+  loadAdImage(currentAdIndex);
   clearTimeout(autoHideTimeout);
   autoHideTimeout = setTimeout(() => {
     showAd = false;
-  }, 5000);
-});
+    currentAdIndex++;
+    cycleAds();
+  }, 10000);
+}
 
-let autoHideTimeout;
-
-adImage.onload = () => {
-  gl.bindTexture(gl.TEXTURE_2D, adTexture);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, adImage);
-
-  setTimeout(() => {
-    showAd = false;
-  }, 10000); // Hide after 10 seconds
-};
-
-// === Overlay drawing ===
 const textCanvas = document.createElement("canvas");
 const ctx = textCanvas.getContext("2d");
 
@@ -214,7 +219,6 @@ function renderOverlay() {
   );
 }
 
-// === Camera setup ===
 const video = document.getElementById("debugVideo");
 
 function draw() {
@@ -246,7 +250,7 @@ function draw() {
   gl.viewport(overlayX, overlayY, overlayW, overlayH);
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-  // === Draw Ad Image (center) ===
+  // Draw Ad
   if (showAd && adImage.complete) {
     gl.bindTexture(gl.TEXTURE_2D, adTexture);
 
