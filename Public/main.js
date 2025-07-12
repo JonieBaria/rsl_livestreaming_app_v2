@@ -76,7 +76,7 @@ setupTexture(overlayTexture);
 setupTexture(adTexture);
 
 // === Ad Images Setup ===
-const adImages = ["ad1.png", "ad2.png"];
+const adImages = ["ad.png", "ad2.png"];
 let currentAdIndex = 0;
 let showAd = false;
 let adImage = new Image();
@@ -254,8 +254,8 @@ function draw() {
   if (showAd && adImage.complete) {
     gl.bindTexture(gl.TEXTURE_2D, adTexture);
 
-    const adW = canvas.width * 0.6;
-    const adH = canvas.height * 0.6;
+    const adW = canvas.width * 0.4;
+    const adH = canvas.height * 0.4;
     const adX = (canvas.width - adW) / 2;
     const adY = (canvas.height - adH) / 2;
 
