@@ -64,6 +64,7 @@ gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 const videoTexture = gl.createTexture();
 const overlayTexture = gl.createTexture();
 const adTexture = gl.createTexture();
+const presentedByTexture = gl.createTexture();
 
 function setupTexture(tex) {
   gl.bindTexture(gl.TEXTURE_2D, tex);
@@ -74,6 +75,7 @@ function setupTexture(tex) {
 setupTexture(videoTexture);
 setupTexture(overlayTexture);
 setupTexture(adTexture);
+setupTexture(presentedByTexture);
 
 // === Ad Images Setup ===
 const adImages = ["ad.png", "ad2.png"];
@@ -120,6 +122,41 @@ function cycleAds() {
   }, 10000);
 }
 
+// === Presented By Canvas ===
+const presentedByCanvas = document.createElement("canvas");
+const presentedByCtx = presentedByCanvas.getContext("2d");
+presentedByCanvas.width = 300;
+presentedByCanvas.height = 50;
+function renderPresentedByText() {
+  presentedByCtx.clearRect(
+    0,
+    0,
+    presentedByCanvas.width,
+    presentedByCanvas.height
+  );
+  presentedByCtx.fillStyle = "white";
+  presentedByCtx.font = "bold 24px Arial";
+  presentedByCtx.textAlign = "center";
+  presentedByCtx.textBaseline = "middle";
+  presentedByCtx.fillText(
+    "Presented by:",
+    presentedByCanvas.width / 2,
+    presentedByCanvas.height / 2
+  );
+
+  gl.bindTexture(gl.TEXTURE_2D, presentedByTexture);
+  gl.texImage2D(
+    gl.TEXTURE_2D,
+    0,
+    gl.RGBA,
+    gl.RGBA,
+    gl.UNSIGNED_BYTE,
+    presentedByCanvas
+  );
+}
+renderPresentedByText();
+
+// === Score Overlay ===
 const textCanvas = document.createElement("canvas");
 const ctx = textCanvas.getContext("2d");
 
@@ -133,11 +170,8 @@ function addScore(side, points) {
 }
 
 function minusScore(side, points) {
-  if (side === "left") {
-    leftScore = Math.max(0, leftScore - points);
-  } else if (side === "right") {
-    rightScore = Math.max(0, rightScore - points);
-  }
+  if (side === "left") leftScore = Math.max(0, leftScore - points);
+  else if (side === "right") rightScore = Math.max(0, rightScore - points);
 }
 
 function renderOverlay() {
@@ -153,7 +187,6 @@ function renderOverlay() {
   textCanvas.height = totalHeight;
 
   ctx.clearRect(0, 0, w, totalHeight);
-
   ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
   ctx.shadowBlur = 12;
   ctx.shadowOffsetX = 0;
@@ -171,28 +204,22 @@ function renderOverlay() {
   ctx.lineTo(0, radius);
   ctx.quadraticCurveTo(0, 0, radius, 0);
   ctx.closePath();
-
   ctx.fillStyle = "#222";
   ctx.fill();
   ctx.clip();
 
-  const leftPanelW = 300;
-  let orangeGradientLeft = ctx.createLinearGradient(0, 0, 200, 0);
-  orangeGradientLeft.addColorStop(0, "#FF9800");
-  orangeGradientLeft.addColorStop(1, "#F57C00");
-  ctx.fillStyle = orangeGradientLeft;
-  ctx.fillRect(0, 0, leftPanelW, h);
+  ctx.fillStyle = ctx.createLinearGradient(0, 0, 200, 0);
+  ctx.fillStyle.addColorStop(0, "#FF9800");
+  ctx.fillStyle.addColorStop(1, "#F57C00");
+  ctx.fillRect(0, 0, 300, h);
 
-  const rightPanelW = 300;
-  let orangeGradientRight = ctx.createLinearGradient(w - 200, 0, w, 0);
-  orangeGradientRight.addColorStop(0, "#FF9800");
-  orangeGradientRight.addColorStop(1, "#F57C00");
-  ctx.fillStyle = orangeGradientRight;
-  ctx.fillRect(w - rightPanelW, 0, rightPanelW, h);
+  ctx.fillStyle = ctx.createLinearGradient(w - 200, 0, w, 0);
+  ctx.fillStyle.addColorStop(0, "#FF9800");
+  ctx.fillStyle.addColorStop(1, "#F57C00");
+  ctx.fillRect(w - 300, 0, 300, h);
 
-  const centerW = 150;
   ctx.fillStyle = "#111";
-  ctx.fillRect((w - centerW) / 2, 0, centerW, h);
+  ctx.fillRect((w - 150) / 2, 0, 150, h);
 
   ctx.fillStyle = "#fff";
   ctx.font = "bold 30px Arial";
@@ -241,31 +268,26 @@ function draw() {
     gl.UNSIGNED_BYTE,
     textCanvas
   );
-
-  const overlayW = textCanvas.width;
-  const overlayH = textCanvas.height;
-  const overlayX = (canvas.width - overlayW) / 2;
-  const overlayY = canvas.height * 0.03;
-
-  gl.viewport(overlayX, overlayY, overlayW, overlayH);
+  gl.viewport(
+    (canvas.width - textCanvas.width) / 2,
+    canvas.height * 0.03,
+    textCanvas.width,
+    textCanvas.height
+  );
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-  // Draw Ad
   if (showAd && adImage.complete) {
-    gl.bindTexture(gl.TEXTURE_2D, adTexture);
-
-    // Target height at 40% of canvas height
     const targetH = canvas.height * 0.55;
-
-    // Maintain aspect ratio from original image
     const aspectRatio = adImage.width / adImage.height;
     const targetW = targetH * aspectRatio;
-
-    // Center position
     const adX = (canvas.width - targetW) / 2;
     const adY = (canvas.height - targetH) / 2;
 
-    // Use calculated values
+    gl.bindTexture(gl.TEXTURE_2D, presentedByTexture);
+    gl.viewport(adX, adY - 60, 300, 50);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+    gl.bindTexture(gl.TEXTURE_2D, adTexture);
     gl.viewport(adX, adY, targetW, targetH);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
@@ -291,22 +313,14 @@ async function setupStreams() {
     const audioStream = await navigator.mediaDevices.getUserMedia({
       audio: true,
     });
-
     const combinedStream = new MediaStream([
       ...canvas.captureStream(30).getVideoTracks(),
       ...audioStream.getAudioTracks(),
     ]);
 
-    let recorder;
-    try {
-      recorder = new MediaRecorder(combinedStream, {
-        mimeType: "video/webm;codecs=vp8,opus",
-      });
-    } catch (e) {
-      alert("MediaRecorder not supported: " + e.message);
-      return;
-    }
-
+    const recorder = new MediaRecorder(combinedStream, {
+      mimeType: "video/webm;codecs=vp8,opus",
+    });
     const socket = new WebSocket("wss://rsl-livestream-lwkk.onrender.com");
     recorder.ondataavailable = (e) => {
       if (e.data.size > 0 && socket.readyState === WebSocket.OPEN) {
