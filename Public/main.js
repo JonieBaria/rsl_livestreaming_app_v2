@@ -80,6 +80,31 @@ const adImage = new Image();
 adImage.src = "ad.png"; // Change to your ad image path
 let showAd = true;
 
+document.getElementById("showAdBtn").addEventListener("click", () => {
+  showAd = true;
+
+  // Refresh texture (in case image is already loaded)
+  if (adImage.complete) {
+    gl.bindTexture(gl.TEXTURE_2D, adTexture);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      adImage
+    );
+  }
+
+  // Auto-hide after 5 seconds
+  clearTimeout(autoHideTimeout);
+  autoHideTimeout = setTimeout(() => {
+    showAd = false;
+  }, 5000);
+});
+
+let autoHideTimeout;
+
 adImage.onload = () => {
   gl.bindTexture(gl.TEXTURE_2D, adTexture);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, adImage);
