@@ -281,7 +281,7 @@ async function setupStreams() {
         facingMode: { ideal: "environment" },
         width: { ideal: 1280 },
         height: { ideal: 720 },
-        zoom: { ideal: 1.0 }, // Some devices support this
+        zoom: { ideal: 2.0 }, // Some devices support this
       },
     });
     video.srcObject = videoStream;
