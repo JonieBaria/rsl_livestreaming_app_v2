@@ -63,6 +63,8 @@ gl.vertexAttribPointer(texLoc, 2, gl.FLOAT, false, 20, 12);
 gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 const videoTexture = gl.createTexture();
 const overlayTexture = gl.createTexture();
+const adTexture = gl.createTexture();
+
 function setupTexture(tex) {
   gl.bindTexture(gl.TEXTURE_2D, tex);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -71,7 +73,23 @@ function setupTexture(tex) {
 }
 setupTexture(videoTexture);
 setupTexture(overlayTexture);
+setupTexture(adTexture);
 
+// === Ad Image Setup ===
+const adImage = new Image();
+adImage.src = "ad.png"; // Change to your ad image path
+let showAd = true;
+
+adImage.onload = () => {
+  gl.bindTexture(gl.TEXTURE_2D, adTexture);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, adImage);
+
+  setTimeout(() => {
+    showAd = false;
+  }, 5000); // Hide after 5 seconds
+};
+
+// === Overlay drawing ===
 const textCanvas = document.createElement("canvas");
 const ctx = textCanvas.getContext("2d");
 
@@ -106,13 +124,11 @@ function renderOverlay() {
 
   ctx.clearRect(0, 0, w, totalHeight);
 
-  // Shadow for entire scorebug
   ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
   ctx.shadowBlur = 12;
   ctx.shadowOffsetX = 0;
   ctx.shadowOffsetY = 4;
 
-  // === Rounded background + clip region ===
   const radius = 16;
   ctx.beginPath();
   ctx.moveTo(radius, 0);
@@ -128,30 +144,26 @@ function renderOverlay() {
 
   ctx.fillStyle = "#222";
   ctx.fill();
-  ctx.clip(); // Everything else is confined inside rounded border
+  ctx.clip();
 
-  // === Left panel (red) — rectangle ===
   const leftPanelW = 300;
   let orangeGradientLeft = ctx.createLinearGradient(0, 0, 200, 0);
-  orangeGradientLeft.addColorStop(0, "#FF9800"); // bright orange
-  orangeGradientLeft.addColorStop(1, "#F57C00"); // deeper orange
+  orangeGradientLeft.addColorStop(0, "#FF9800");
+  orangeGradientLeft.addColorStop(1, "#F57C00");
   ctx.fillStyle = orangeGradientLeft;
   ctx.fillRect(0, 0, leftPanelW, h);
 
-  // === Right panel (blue) — rectangle ===
   const rightPanelW = 300;
   let orangeGradientRight = ctx.createLinearGradient(w - 200, 0, w, 0);
-  orangeGradientRight.addColorStop(0, "#FF9800"); // bright orange
-  orangeGradientRight.addColorStop(1, "#F57C00"); // deeper orange
+  orangeGradientRight.addColorStop(0, "#FF9800");
+  orangeGradientRight.addColorStop(1, "#F57C00");
   ctx.fillStyle = orangeGradientRight;
   ctx.fillRect(w - rightPanelW, 0, rightPanelW, h);
 
-  // === Center box ===
   const centerW = 150;
   ctx.fillStyle = "#111";
   ctx.fillRect((w - centerW) / 2, 0, centerW, h);
 
-  // === Team names ===
   ctx.fillStyle = "#fff";
   ctx.font = "bold 30px Arial";
   ctx.textAlign = "center";
@@ -159,11 +171,9 @@ function renderOverlay() {
   ctx.fillText(leftName, 130, h / 2);
   ctx.fillText(rightName, w - 130, h / 2);
 
-  // === Score text ===
   ctx.font = "bold 36px Arial";
   ctx.fillText(`${leftScore} - ${rightScore}`, w / 2, h / 2);
 
-  // === League bar ===
   ctx.shadowBlur = 6;
   ctx.fillStyle = "#000";
   ctx.fillRect(0, h, w, leagueBarHeight);
@@ -181,16 +191,6 @@ function renderOverlay() {
 
 // === Camera setup ===
 const video = document.getElementById("debugVideo");
-// const canvasStream = await navigator.mediaDevices
-//   .getUserMedia({ video: true })
-//   .then((stream) => {
-//     video.srcObject = stream;
-//     video.play();
-//     video.onloadeddata = () => requestAnimationFrame(draw);
-//   })
-//   .catch((err) => alert("Camera access denied: " + err.message));
-
-// const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
 function draw() {
   gl.viewport(0, 0, canvas.width, canvas.height);
@@ -221,34 +221,41 @@ function draw() {
   gl.viewport(overlayX, overlayY, overlayW, overlayH);
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
+  // === Draw Ad Image (center) ===
+  if (showAd && adImage.complete) {
+    gl.bindTexture(gl.TEXTURE_2D, adTexture);
+
+    const adW = 300;
+    const adH = 150;
+    const adX = (canvas.width - adW) / 2;
+    const adY = (canvas.height - adH) / 2;
+
+    gl.viewport(adX, adY, adW, adH);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+
   gl.viewport(0, 0, canvas.width, canvas.height);
   requestAnimationFrame(draw);
 }
 
 async function setupStreams() {
   try {
-    // Start camera video stream
     const videoStream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: { ideal: "environment" }, // request rear camera
-      },
+      video: { facingMode: { ideal: "environment" } },
     });
     video.srcObject = videoStream;
     video.play();
     video.onloadeddata = () => requestAnimationFrame(draw);
 
-    // Start microphone audio stream
     const audioStream = await navigator.mediaDevices.getUserMedia({
       audio: true,
     });
 
-    // Combine both streams into one
     const combinedStream = new MediaStream([
       ...canvas.captureStream(30).getVideoTracks(),
       ...audioStream.getAudioTracks(),
     ]);
 
-    // Create MediaRecorder
     let recorder;
     try {
       recorder = new MediaRecorder(combinedStream, {
@@ -258,6 +265,7 @@ async function setupStreams() {
       alert("MediaRecorder not supported: " + e.message);
       return;
     }
+
     const socket = new WebSocket("wss://rsl-livestream-lwkk.onrender.com");
     recorder.ondataavailable = (e) => {
       if (e.data.size > 0 && socket.readyState === WebSocket.OPEN) {
@@ -270,26 +278,4 @@ async function setupStreams() {
   }
 }
 
-// Call the async setup function
 setupStreams();
-
-// const combinedStream = new MediaStream([
-//   ...canvasStream.getVideoTracks(),
-//   ...audioStream.getAudioTracks(),
-// ]);
-
-// let recorder;
-// try {
-//   recorder = new MediaRecorder(combinedStream, {
-//     mimeType: "video/webm;codecs=vp8,opus",
-//   });
-// } catch (e) {
-//   alert("MediaRecorder not supported.");
-// }
-// const socket = new WebSocket("wss://rsl-livestream-lwkk.onrender.com");
-// recorder.ondataavailable = (e) => {
-//   if (e.data.size > 0 && socket.readyState === WebSocket.OPEN) {
-//     socket.send(e.data);
-//   }
-// };
-// recorder.start(100);
