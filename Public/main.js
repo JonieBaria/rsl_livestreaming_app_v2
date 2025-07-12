@@ -208,14 +208,16 @@ function renderOverlay() {
   ctx.fill();
   ctx.clip();
 
-  ctx.fillStyle = ctx.createLinearGradient(0, 0, 200, 0);
-  ctx.fillStyle.addColorStop(0, "#FF9800");
-  ctx.fillStyle.addColorStop(1, "#F57C00");
+  let gradLeft = ctx.createLinearGradient(0, 0, 200, 0);
+  gradLeft.addColorStop(0, "#FF9800");
+  gradLeft.addColorStop(1, "#F57C00");
+  ctx.fillStyle = gradLeft;
   ctx.fillRect(0, 0, 300, h);
 
-  ctx.fillStyle = ctx.createLinearGradient(w - 200, 0, w, 0);
-  ctx.fillStyle.addColorStop(0, "#FF9800");
-  ctx.fillStyle.addColorStop(1, "#F57C00");
+  let gradRight = ctx.createLinearGradient(w - 200, 0, w, 0);
+  gradRight.addColorStop(0, "#FF9800");
+  gradRight.addColorStop(1, "#F57C00");
+  ctx.fillStyle = gradRight;
   ctx.fillRect(w - 300, 0, 300, h);
 
   ctx.fillStyle = "#111";
@@ -284,7 +286,7 @@ function draw() {
     const adY = (canvas.height - targetH) / 2;
 
     gl.bindTexture(gl.TEXTURE_2D, presentedByTexture);
-    gl.viewport(adX, adY - 60, 300, 50);
+    gl.viewport(adX, adY - 70, 300, 50);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
     gl.bindTexture(gl.TEXTURE_2D, adTexture);
