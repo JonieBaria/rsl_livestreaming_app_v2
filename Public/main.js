@@ -17,10 +17,9 @@ gl.shaderSource(
   attribute vec2 texCoord;
   varying vec2 vTexCoord;
   void main() {
-  float zoom = 1.2; // Increase this to zoom in
-  gl_Position = vec4(position * zoom, 1.0);
-  vTexCoord = texCoord;
-}
+    gl_Position = vec4(position, 1.0);
+    vTexCoord = texCoord;
+  }
 `
 );
 gl.compileShader(vs);
@@ -278,7 +277,12 @@ function draw() {
 async function setupStreams() {
   try {
     const videoStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { ideal: "environment" } },
+      video: {
+        facingMode: { ideal: "environment" },
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+        zoom: { ideal: 1.0 }, // Some devices support this
+      },
     });
     video.srcObject = videoStream;
     video.play();
