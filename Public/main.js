@@ -78,7 +78,7 @@ setupTexture(adTexture);
 // === Ad Image Setup ===
 const adImage = new Image();
 adImage.src = "ad.png"; // Change to your ad image path
-let showAd = true;
+let showAd = false;
 
 document.getElementById("showAdBtn").addEventListener("click", () => {
   showAd = true;
