@@ -255,7 +255,7 @@ function draw() {
     gl.bindTexture(gl.TEXTURE_2D, adTexture);
 
     // Target height at 40% of canvas height
-    const targetH = canvas.height * 0.7;
+    const targetH = canvas.height * 0.55;
 
     // Maintain aspect ratio from original image
     const aspectRatio = adImage.width / adImage.height;
