@@ -111,7 +111,7 @@ adImage.onload = () => {
 
   setTimeout(() => {
     showAd = false;
-  }, 5000); // Hide after 5 seconds
+  }, 10000); // Hide after 10 seconds
 };
 
 // === Overlay drawing ===
@@ -250,8 +250,8 @@ function draw() {
   if (showAd && adImage.complete) {
     gl.bindTexture(gl.TEXTURE_2D, adTexture);
 
-    const adW = 300;
-    const adH = 150;
+    const adW = canvas.width * 0.4;
+    const adH = canvas.height * 0.4;
     const adX = (canvas.width - adW) / 2;
     const adY = (canvas.height - adH) / 2;
 
