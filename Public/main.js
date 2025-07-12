@@ -254,15 +254,15 @@ function draw() {
   if (showAd && adImage.complete) {
     gl.bindTexture(gl.TEXTURE_2D, adTexture);
 
-    const targetH = canvas.height * 0.6;
+    // Target height at 40% of canvas height
+    const targetH = canvas.height * 0.7;
 
     // Maintain aspect ratio from original image
     const aspectRatio = adImage.width / adImage.height;
     const targetW = targetH * aspectRatio;
 
-    // Center position
-    const adX = (canvas.width - targetW) / 2;
-    const adY = (canvas.height - targetH) / 2;
+    const adX = (canvas.width - adW) / 2;
+    const adY = (canvas.height - adH) / 2;
 
     gl.viewport(adX, adY, adW, adH);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
